@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avisekh Dairy — Book Milk, Paneer, Curd & Ghee Online</title>
+<style>
+  :root{
+    --cream:#FFF8EF;
+    --cream-dark:#FBEEDD;
+    --brown:#5C3A21;
+    --brown-dark:#3E2712;
+    --terracotta:#D97B4F;
+    --terracotta-dark:#B85E36;
+    --green:#4C8B5C;
+    --line:#EAD9C4;
+    --white:#FFFFFF;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--cream);
+    color:var(--brown-dark);
+    padding-bottom:90px;
+  }
+  header.top{
+    background:var(--brown);
+    color:var(--cream);
+    padding:18px 16px 22px;
+    text-align:center;
+    border-bottom:4px solid var(--terracotta);
+  }
+  header.top h1{margin:0 0 6px;font-size:1.5rem;}
+  header.top p{margin:2px 0;font-size:0.92rem;opacity:0.95;}
+  .badge-closed{
+    display:inline-block;margin-top:8px;background:var(--terracotta-dark);
+    padding:4px 10px;border-radius:20px;font-size:0.8rem;
+  }
+  nav.tabs{
+    display:flex;position:sticky;top:0;z-index:50;background:var(--cream-dark);
+    border-bottom:1px solid var(--line);
+  }
+  nav.tabs button{
+    flex:1;padding:12px 4px;border:none;background:transparent;font-size:0.78rem;
+    font-weight:600;color:var(--brown);cursor:pointer;
+  }
+  nav.tabs button.active{background:var(--terracotta);color:white;}
+  main{padding:14px 14px 20px;max-width:640px;margin:0 auto;}
+  .category-title{
+    font-size:1.05rem;margin:22px 0 10px;color:var(--brown);
+    border-bottom:2px solid var(--terracotta);padding-bottom:4px;
+  }
+  .item-card{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;
+  }
+  .item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .item-emoji{font-size:1.8rem;line-height:1;}
+  .item-info{flex:1;}
+  .item-info .name{font-weight:700;font-size:1rem;}
+  .item-info .meta{font-size:0.82rem;color:#8a6a4d;margin-top:2px;}
+  .price{font-weight:700;color:var(--terracotta-dark);font-size:1rem;white-space:nowrap;}
+  .tag{
+    display:inline-block;font-size:0.7rem;padding:2px 8px;border-radius:20px;
+    margin-top:4px;margin-right:4px;font-weight:600;
+  }
+  .tag.eggless{background:#E3F1E6;color:var(--green);}
+  .tag.made{background:#FBEAD9;color:var(--terracotta-dark);}
+  .tag.sold-out{background:#FDECEA;color:#c0392b;}
+  .item-card.out-of-stock{opacity:0.7;background:#FAFAFA;}
+  .btn{
+    border:none;border-radius:10px;padding:10px 14px;font-size:0.92rem;font-weight:700;
+    cursor:pointer;
+  }
+  .btn.primary{background:var(--terracotta);color:white;}
+  .btn.primary:active{background:var(--terracotta-dark);}
+  .btn.outline{background:white;border:1.5px solid var(--terracotta);color:var(--terracotta-dark);}
+  .btn.full{width:100%;}
+  .btn.small{padding:6px 10px;font-size:0.82rem;}
+  .qty-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
+  .qty-row button.small-step{
+    width:32px;height:32px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);
+    background:var(--cream-dark);font-size:1.1rem;cursor:pointer;
+  }
+  .qty-row span{min-width:20px;text-align:center;font-weight:700;flex-shrink:0;}
+  .qty-row button.btn.primary{
+    margin-left:auto;white-space:nowrap;flex-shrink:0;padding:10px 12px;font-size:0.85rem;
+  }
+  .made-panel{
+    background:var(--cream-dark);border-radius:10px;padding:10px;margin-top:4px;
+    display:none;
+  }
+  .made-panel.open{display:block;}
+  .made-panel label{display:block;font-size:0.8rem;font-weight:600;margin:8px 0 3px;color:var(--brown);}
+  .made-panel select, .made-panel input, .made-panel textarea{
+    width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);font-size:0.9rem;
+    font-family:inherit;
+  }
+  .note-line{font-size:0.78rem;color:#8a6a4d;margin-top:4px;}
+  .cart-bar{
+    position:fixed;bottom:0;left:0;right:0;background:var(--brown);color:white;
+    padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+    z-index:60;box-shadow:0 -3px 10px rgba(0,0,0,0.15);
+  }
+  .cart-bar.hidden{display:none;}
+  .cart-bar .info{font-size:0.9rem;}
+  .cart-bar button{background:var(--terracotta);color:white;border:none;border-radius:10px;
+    padding:9px 16px;font-weight:700;font-size:0.9rem;cursor:pointer;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .cart-item{
+    background:white;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+    margin-bottom:8px;
+  }
+  .cart-item .row{display:flex;justify-content:space-between;align-items:center;}
+  .cart-item .sub{font-size:0.8rem;color:#8a6a4d;margin-top:3px;}
+  .remove-link{color:var(--terracotta-dark);font-size:0.8rem;font-weight:700;background:none;
+    border:none;cursor:pointer;text-decoration:underline;padding:0;}
+  form.checkout label{display:block;font-weight:600;margin:12px 0 4px;font-size:0.9rem;}
+  form.checkout input, form.checkout select, form.checkout textarea{
+    width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);font-size:0.95rem;
+    font-family:inherit;
+  }
+  .pay-options label{
+    display:flex;align-items:center;gap:8px;font-weight:500;background:white;
+    border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;
+  }
+  .conf-box{
+    background:white;border:1px solid var(--line);border-radius:16px;padding:20px;
+    text-align:center;margin-top:10px;
+  }
+  .order-id{
+    font-size:1.3rem;font-weight:800;color:var(--terracotta-dark);letter-spacing:1px;
+    margin:8px 0 14px;
+  }
+  canvas#qrCanvas{border:8px solid white;box-shadow:0 0 0 1px var(--line);border-radius:8px;margin:10px auto;}
+  .summary-list{text-align:left;margin-top:14px;}
+  .summary-list .line{border-bottom:1px dashed var(--line);padding:8px 0;font-size:0.9rem;}
+  .disclaimer{
+    background:#FBEAD9;border:1px solid var(--terracotta);border-radius:10px;
+    padding:10px 12px;font-size:0.82rem;color:var(--brown-dark);margin:10px 0 4px;
+  }
+  .empty-msg{text-align:center;color:#8a6a4d;padding:40px 10px;}
+  .status-col{margin-bottom:20px;}
+  .status-title{
+    font-weight:800;background:var(--brown);color:white;padding:6px 12px;border-radius:20px;
+    display:inline-block;font-size:0.85rem;margin-bottom:10px;
+  }
+  .order-card{
+    background:white;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+    margin-bottom:10px;font-size:0.85rem;
+  }
+  .order-card .items{margin:6px 0;padding-left:16px;}
+  .order-card .actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  a.wa-link{color:var(--green);font-weight:700;text-decoration:none;}
+  .back-link{background:none;border:none;color:var(--terracotta-dark);font-weight:700;
+    cursor:pointer;padding:0;font-size:0.9rem;margin-bottom:10px;}
+
+  /* Shop closed state */
+  .shop-disabled .btn.primary, .shop-disabled .small-step, .shop-disabled .btn.outline.full {
+    pointer-events: none; opacity: 0.45; filter: grayscale(40%);
+  }
+  #shopClosedBanner { font-weight: 600; }
+  .cart-closed-msg {
+    text-align: center; padding: 30px 16px; background: white;
+    border: 1px dashed var(--line); border-radius: 12px; color: var(--brown-dark);
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🥛 Avisekh Dairy</h1>
+  <p>Asansol, West Bengal</p>
+  <p>📞 <a href="tel:9999999999" style="color:inherit;">9999999999</a> &nbsp;|&nbsp; 💬 WhatsApp same number</p>
+  <p>Book fresh milk, paneer, curd & ghee — pickup or home delivery</p>
+</header>
+
+<nav class="tabs">
+  <button id="tabOrderBtn" class="active" onclick="showScreen('order')">🛒 Order</button>
+  <button id="tabTrackBtn" onclick="showScreen('track')">📦 Track Order</button>
+</nav>
+
+<!-- ORDER SCREEN -->
+<div id="screen-order" class="screen active">
+  <main>
+    <div id="shopClosedBanner" style="display:none;" class="disclaimer">
+      🚫 <b>We're currently closed for new orders.</b> <span id="shopClosedNote"></span>
+    </div>
+    <input type="text" id="menuSearchInput" placeholder="🔍 Search the menu…" oninput="filterMenu()"
+      style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);margin-bottom:6px;font-size:0.95rem;">
+    <div id="menuMain"><div class="empty-msg">Loading menu…</div></div>
+  </main>
+</div>
+
+<!-- CART SCREEN -->
+<div id="screen-cart" class="screen">
+  <main>
+    <button class="back-link" onclick="showScreen('order')">← Back to menu</button>
+    <h2 style="color:var(--brown)">Your Cart</h2>
+    <div id="cartList"></div>
+    <button class="btn primary full" style="margin-top:14px;" onclick="showScreen('checkout')" id="toCheckoutBtn">Proceed to Checkout</button>
+  </main>
+</div>
+
+<!-- CHECKOUT SCREEN -->
+<div id="screen-checkout" class="screen">
+  <main>
+    <button class="back-link" onclick="showScreen('cart')">← Back to cart</button>
+    <h2 style="color:var(--brown)">Checkout</h2>
+    <form class="checkout" id="checkoutForm" onsubmit="return submitOrder(event)">
+      <label>Your Name</label>
+      <input type="text" id="custName" required>
+      <label>Phone Number</label>
+      <input type="tel" id="custPhone" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required>
+
+      <label>How will you get your order?</label>
+      <div class="pay-options">
+        <label><input type="radio" name="fulfillMethod" value="Pickup" checked onchange="updateCheckoutFields()"> Pickup from shop</label>
+        <label><input type="radio" name="fulfillMethod" value="Delivery" onchange="updateCheckoutFields()"> Home delivery</label>
+      </div>
+      <div id="addressField" style="display:none;">
+        <label>Delivery Address</label>
+        <textarea id="custAddress" rows="2" placeholder="House no, street, landmark"></textarea>
+      </div>
+
+      <label>Booking Type</label>
+      <div class="pay-options">
+        <label><input type="radio" name="orderType" value="OneTime" checked onchange="updateCheckoutFields()"> One-time booking</label>
+        <label><input type="radio" name="orderType" value="Subscription" onchange="updateCheckoutFields()"> Daily subscription</label>
+      </div>
+
+      <div id="oneTimeFields">
+        <label>Booking Date</label>
+        <select id="bookingDate"></select>
+      </div>
+
+      <div id="subscriptionFields" style="display:none;">
+        <label>Start Date</label>
+        <select id="subStartDate"></select>
+        <label>Duration</label>
+        <select id="subDuration">
+          <option value="7">7 days</option>
+          <option value="15">15 days</option>
+          <option value="30">30 days</option>
+          <option value="">Until I cancel</option>
+        </select>
+        <div class="disclaimer">This sets up a daily standing order. We'll confirm your subscription and delivery/pickup time on WhatsApp.</div>
+      </div>
+
+      <label>Payment Method</label>
+      <div class="pay-options">
+        <label><input type="radio" name="pay" value="Cash" checked> Cash</label>
+        <label><input type="radio" name="pay" value="UPI"> UPI</label>
+      </div>
+      <label>Note for us (optional)</label>
+      <textarea id="custNote" rows="2" placeholder="e.g. call before delivering"></textarea>
+      <div class="disclaimer">
+        Reminder: this page can't charge cards or notify us automatically. If you don't hear back, please message us directly on WhatsApp: <b>9999999999</b>.
+      </div>
+      <button type="submit" class="btn primary full" style="margin-top:14px;">Place Booking</button>
+    </form>
+  </main>
+</div>
+
+<!-- CONFIRMATION SCREEN -->
+<div id="screen-confirm" class="screen">
+  <main>
+    <div class="conf-box">
+      <div style="font-size:2rem;">✅</div>
+      <h2 style="color:var(--brown);margin:6px 0;" id="confHeading">Booking Placed!</h2>
+
+      <!-- ONE-TIME BOOKING CONFIRMATION -->
+      <div id="confOneTimeBlock">
+        <div class="order-id" id="confOrderId"></div>
+        <canvas id="qrCanvas" width="160" height="160"></canvas>
+        <div class="note-line">Show this code or your Order ID when you collect / it's delivered</div>
+        <div class="summary-list" id="confSummary"></div>
+        <div class="disclaimer" style="text-align:left;" id="confFulfillmentNote"></div>
+        <button class="btn outline full" style="margin-top:10px;" onclick="goToTrackFromConfirm()">Track This Order</button>
+      </div>
+
+      <!-- SUBSCRIPTION CONFIRMATION -->
+      <div id="confSubscriptionBlock" style="display:none;">
+        <div class="order-id" id="confSubId"></div>
+        <div class="summary-list" id="confSubSummary"></div>
+        <div class="disclaimer" style="text-align:left;">
+          We've noted your daily subscription and will confirm delivery/pickup timing on WhatsApp (9999999999). You can message us anytime to pause or cancel it.
+        </div>
+      </div>
+
+      <button class="btn primary full" style="margin-top:16px;" onclick="showScreen('order')">Order More / Done</button>
+    </div>
+  </main>
+</div>
+
+<!-- TRACK ORDER SCREEN -->
+<div id="screen-track" class="screen">
+  <main>
+    <h2 style="color:var(--brown)">Track Your Order</h2>
+    <div class="disclaimer">Enter your Order ID (shown on your confirmation screen) to see its live status.</div>
+    <label style="font-weight:600;display:block;margin:10px 0 4px;">Order ID</label>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="trackOrderId" placeholder="e.g. AVB123456" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);text-transform:uppercase;">
+      <button class="btn primary" onclick="startTrackPolling()">Check</button>
+    </div>
+    <div id="trackResult" style="margin-top:18px;"></div>
+  </main>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar hidden" id="cartBar">
+  <div class="info" id="cartBarInfo">0 items</div>
+  <button onclick="showScreen('cart')">View Cart</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================= SUPABASE SETUP ================= */
+const SUPABASE_URL = "https://ktyibnbbxrfokzeuidkz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0eWlibmJieHJmb2t6ZXVpZGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0Njk2MDgsImV4cCI6MjEwNDA0NTYwOH0.yJIJHtaNfYWC_Nwo0ng7TNVsJOh7puR-JAGhM5G-4cQ";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ================= SHOP OPEN/CLOSED STATUS ================= */
+let shopOpen = true;
+let shopClosedMessage = "Please check back during our operating hours.";
+
+async function fetchShopStatus(){
+  const { data, error } = await sb.from('shop_settings').select('*').eq('id', 1).single();
+  if(!error && data){
+    shopOpen = data.is_open !== false;
+    shopClosedMessage = data.closed_message || shopClosedMessage;
+  }
+  applyShopStatusUI();
+}
+
+function applyShopStatusUI(){
+  const banner = document.getElementById('shopClosedBanner');
+  const note = document.getElementById('shopClosedNote');
+  const menuMain = document.getElementById('menuMain');
+  const cartBar = document.getElementById('cartBar');
+
+  if(!shopOpen){
+    banner.style.display = 'block';
+    note.textContent = shopClosedMessage;
+    menuMain.classList.add('shop-disabled');
+    cartBar.classList.add('hidden');
+  } else {
+    banner.style.display = 'none';
+    menuMain.classList.remove('shop-disabled');
+    if(cart.length > 0) cartBar.classList.remove('hidden');
+  }
+  if(document.getElementById('screen-cart').classList.contains('active')) renderCart();
+}
+
+// Re-check shop status periodically so a closure shows up without a page reload
+setInterval(fetchShopStatus, 30000);
+
+/* ================= DATA (loaded from Supabase) ================= */
+let ITEMS = []; // populated by fetchMenuItems()
+
+async function fetchMenuItems(){
+  const menuMain = document.getElementById('menuMain');
+  const { data, error } = await sb.from('inventory').select('*').order('category').order('name');
+  if(error){
+    menuMain.innerHTML = `<div class="empty-msg">Couldn't load the menu right now. Please refresh, or message us on WhatsApp. (${error.message})</div>`;
+    return;
+  }
+  ITEMS = (data || []).map(row => ({
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    price: row.price,
+    unit: row.unit,
+    type: row.order_type,
+    eggless: row.eggless,
+    stockQty: row.stock_qty,
+    lowStockThreshold: row.min_stock,
+    outOfStock: row.is_marked_out === true || Number(row.stock_qty) <= 0
+  }));
+  renderMenu();
+}
+
+// Re-check the menu periodically so stock/out-of-stock changes made by
+// the owner show up without the customer needing to reload the page.
+setInterval(fetchMenuItems, 30000);
+const BOOKING_LEAD_DAYS = 1;   // earliest booking date = tomorrow
+const BOOKING_WINDOW_DAYS = 7; // customers can book up to 7 days ahead
+
+const EMOJI = {
+  "Milk":"🥛","Paneer":"🧀","Curd":"🥣","Ghee":"🧈"
+};
+
+/* ================= DATE HELPERS ================= */
+function fmtDate(d){
+  return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+}
+function earliestBookingDate(){
+  let d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + BOOKING_LEAD_DAYS);
+  return d;
+}
+function latestBookingDate(){
+  let d = earliestBookingDate();
+  d.setDate(d.getDate() + BOOKING_WINDOW_DAYS - 1);
+  return d;
+}
+function toISODate(d){ return d.toISOString().slice(0,10); }
+function bookingDateOptions(){
+  const opts = [];
+  let d = earliestBookingDate();
+  for(let i=0;i<BOOKING_WINDOW_DAYS;i++){
+    opts.push(new Date(d));
+    d.setDate(d.getDate()+1);
+  }
+  return opts;
+}
+
+/* ================= CART STATE ================= */
+let cart = []; // {id, name, category, price, unit, qty}
+
+function addOrUpdateCartItem(item){
+  cart.push(item);
+  renderCartBar();
+}
+function renderCartBar(){
+  const bar = document.getElementById('cartBar');
+  if(cart.length === 0){ bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  document.getElementById('cartBarInfo').textContent = cart.length + " item" + (cart.length>1?"s":"") + " in cart";
+}
+
+/* ================= RENDER MENU ================= */
+function renderMenu(){
+  const main = document.getElementById('menuMain');
+  main.innerHTML = "";
+  const query = (document.getElementById('menuSearchInput')?.value || "").trim().toLowerCase();
+  const visibleItems = query ? ITEMS.filter(i=>i.name.toLowerCase().includes(query)) : ITEMS;
+
+  if(query && visibleItems.length === 0){
+    main.innerHTML = `<div class="empty-msg">No items match "${query}". Try a different search.</div>`;
+    return;
+  }
+
+  const categories = [...new Set(visibleItems.map(i=>i.category))];
+  categories.forEach(cat=>{
+    const title = document.createElement('div');
+    title.className = 'category-title';
+    title.textContent = (EMOJI[cat]||"🍽️") + " " + cat;
+    main.appendChild(title);
+
+    visibleItems.filter(i=>i.category===cat).forEach((item, idx)=>{
+      main.appendChild(renderItemCard(item, cat+"-"+idx));
+    });
+  });
+}
+
+function filterMenu(){
+  renderMenu();
+}
+
+function renderItemCard(item, uid){
+  const card = document.createElement('div');
+  card.className = 'item-card' + (item.outOfStock ? ' out-of-stock' : '');
+
+  const top = document.createElement('div');
+  top.className = 'item-top';
+  top.innerHTML = `
+    <div class="item-emoji">${EMOJI[item.category]||"🍽️"}</div>
+    <div class="item-info">
+      <div class="name">${item.name}</div>
+      <div class="meta">${item.unit}</div>
+      ${item.outOfStock ? `<span class="tag sold-out">Sold Out</span>` : ""}
+    </div>
+    <div class="price">₹${item.price}</div>
+  `;
+  card.appendChild(top);
+
+  if(item.outOfStock){
+    const note = document.createElement('div');
+    note.className = 'note-line';
+    note.textContent = "Currently unavailable — check back soon.";
+    card.appendChild(note);
+    return card;
+  }
+
+  // Litre/kg items are commonly bought in half-units (e.g. 0.5L)
+  const step = /litre|kg/i.test(item.unit) ? 0.5 : 1;
+
+  const qtyRow = document.createElement('div');
+  qtyRow.className = 'qty-row';
+  qtyRow.innerHTML = `
+    <button type="button" class="small-step" onclick="stepQty(this, ${-step})">−</button>
+    <span>${step}</span>
+    <button type="button" class="small-step" onclick="stepQty(this, ${step})">+</button>
+    <button type="button" class="btn primary">Add to Cart</button>
+  `;
+  const addBtn = qtyRow.querySelector('button.primary');
+  addBtn.onclick = ()=>{
+    const q = parseFloat(qtyRow.querySelector('span').textContent);
+    addOrUpdateCartItem({
+      id:item.id, name:item.name, category:item.category, price:item.price, unit:item.unit, qty:q
+    });
+    addBtn.textContent = "Added ✓";
+    setTimeout(()=>{addBtn.textContent="Add to Cart";}, 900);
+  };
+  card.appendChild(qtyRow);
+  return card;
+}
+
+function stepQty(btn, delta){
+  const span = delta < 0 ? btn.nextElementSibling : btn.previousElementSibling;
+  const step = Math.abs(delta);
+  const next = Math.round((parseFloat(span.textContent) + delta) / step) * step;
+  span.textContent = Math.max(step, next);
+}
+
+
+/* ================= CART SCREEN ================= */
+function renderCart(){
+  const list = document.getElementById('cartList');
+  const checkoutBtn = document.getElementById('toCheckoutBtn');
+
+  if(!shopOpen){
+    list.innerHTML = `<div class="cart-closed-msg">🚫 <b>We're currently closed for new orders.</b><br>${shopClosedMessage}<br><br>You won't be able to see your order total or check out until we reopen.</div>`;
+    checkoutBtn.style.display = 'none';
+    return;
+  }
+
+  if(cart.length === 0){
+    list.innerHTML = `<div class="empty-msg">Your cart is empty. Go back to the menu to add something tasty!</div>`;
+    checkoutBtn.style.display = 'none';
+    return;
+  }
+  checkoutBtn.style.display = 'block';
+  list.innerHTML = "";
+  cart.forEach((c, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div class="row">
+        <div><b>${c.name}</b> × ${c.qty} (${c.unit})</div>
+        <div>₹${(c.price * c.qty).toFixed(2)}</div>
+      </div>
+      <button class="remove-link" onclick="removeCartItem(${idx})">Remove</button>
+    `;
+    list.appendChild(div);
+  });
+}
+function removeCartItem(idx){
+  cart.splice(idx,1);
+  renderCart();
+  renderCartBar();
+}
+
+/* ================= CHECKOUT / ORDER ================= */
+function cartTotal(){
+  return cart.reduce((sum,c)=>sum + c.price*c.qty, 0);
+}
+
+function populateCheckoutDates(){
+  const opts = bookingDateOptions().map(d=>{
+    const iso = toISODate(d);
+    return `<option value="${iso}">${fmtDate(d)}</option>`;
+  }).join("");
+  document.getElementById('bookingDate').innerHTML = opts;
+  document.getElementById('subStartDate').innerHTML = opts;
+}
+
+function updateCheckoutFields(){
+  const method = document.querySelector('input[name="fulfillMethod"]:checked').value;
+  document.getElementById('addressField').style.display = method === 'Delivery' ? 'block' : 'none';
+  document.getElementById('custAddress').required = method === 'Delivery';
+
+  const orderType = document.querySelector('input[name="orderType"]:checked').value;
+  document.getElementById('oneTimeFields').style.display = orderType === 'OneTime' ? 'block' : 'none';
+  document.getElementById('subscriptionFields').style.display = orderType === 'Subscription' ? 'block' : 'none';
+}
+
+function submitOrder(e){
+  e.preventDefault();
+  if(!shopOpen){
+    alert("Sorry, we're currently closed for new bookings. " + shopClosedMessage);
+    showScreen('order');
+    return false;
+  }
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const pay = document.querySelector('input[name="pay"]:checked').value;
+  const note = document.getElementById('custNote').value.trim();
+  const fulfillMethod = document.querySelector('input[name="fulfillMethod"]:checked').value;
+  const address = document.getElementById('custAddress').value.trim();
+  const orderType = document.querySelector('input[name="orderType"]:checked').value;
+  const submitBtn = document.querySelector('#checkoutForm button[type="submit"]');
+
+  if(fulfillMethod === 'Delivery' && !address){
+    alert("Please enter a delivery address.");
+    return false;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Placing booking...";
+
+  if(orderType === 'Subscription'){
+    const startDate = document.getElementById('subStartDate').value;
+    const durationVal = document.getElementById('subDuration').value;
+    const subId = "SUB" + Date.now().toString().slice(-6) + Math.floor(Math.random()*90+10);
+    const sub = {
+      id: subId, name, phone,
+      fulfillment_method: fulfillMethod,
+      address: fulfillMethod === 'Delivery' ? address : null,
+      start_date: startDate,
+      duration_days: durationVal ? parseInt(durationVal) : null,
+      items: JSON.parse(JSON.stringify(cart)),
+      daily_total: cartTotal(),
+      status: "Active",
+      note: note || null
+    };
+    saveSubscription(sub).then(result=>{
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Place Booking";
+      if(!result.success){
+        alert("Sorry, we couldn't save your subscription online right now (" + result.errorMsg + "). Please try again, or message us directly on WhatsApp: 9999999999.");
+        return;
+      }
+      showSubscriptionConfirmation(sub);
+      cart = [];
+      renderCartBar();
+      document.getElementById('checkoutForm').reset();
+      updateCheckoutFields();
+    });
+    return false;
+  }
+
+  const bookingDate = document.getElementById('bookingDate').value;
+  const orderId = "AVB" + Date.now().toString().slice(-6) + Math.floor(Math.random()*90+10);
+  const order = {
+    id: orderId, name, phone, pay, note,
+    fulfillment_method: fulfillMethod,
+    address: fulfillMethod === 'Delivery' ? address : null,
+    fulfillment_date: bookingDate,
+    items: JSON.parse(JSON.stringify(cart)),
+    total: cartTotal(),
+    status: "New",
+    placed_at: new Date().toISOString()
+  };
+
+  saveOrder(order).then(result=>{
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Place Booking";
+    if(!result.success){
+      alert("Sorry, we couldn't save your booking online right now (" + result.errorMsg + "). Please try again, or just message us directly on WhatsApp: 9999999999.");
+      return;
+    }
+    applyStockDeductions(order.items);
+    showConfirmation(order);
+    cart = [];
+    renderCartBar();
+    document.getElementById('checkoutForm').reset();
+    updateCheckoutFields();
+  });
+  return false;
+}
+
+// Deduct each ordered item's quantity from its stock in Supabase.
+// Runs after the order is confirmed saved, so a failed deduction never
+// blocks the order itself — worst case, stock briefly drifts and the
+// owner can correct it from the dashboard.
+function applyStockDeductions(items){
+  items.forEach(item=>{
+    if(!item.id) return; // safety: skip if item wasn't matched to a menu row
+    sb.rpc('decrement_inventory_stock', { p_item_id: item.id, p_qty: item.qty }).then(({error})=>{
+      if(error) console.error('Stock deduction failed for', item.name, error.message);
+    });
+  });
+  // Refresh the menu shortly after so newly-out-of-stock items update on screen
+  setTimeout(fetchMenuItems, 1500);
+}
+
+function showConfirmation(order){
+  document.getElementById('confHeading').textContent = "Booking Placed!";
+  document.getElementById('confOneTimeBlock').style.display = 'block';
+  document.getElementById('confSubscriptionBlock').style.display = 'none';
+
+  document.getElementById('confOrderId').textContent = "Order ID: " + order.id;
+  localStorage.setItem('avisekh_last_order_id', order.id);
+  const summary = document.getElementById('confSummary');
+  let html = "";
+  order.items.forEach(c=>{
+    html += `<div class="line"><b>${c.name}</b> × ${c.qty} (${c.unit}) — ₹${(c.price*c.qty).toFixed(2)}</div>`;
+  });
+  html += `<div class="line"><b>Total:</b> ₹${order.total.toFixed(2)}</div>`;
+  html += `<div class="line"><b>Payment:</b> ${order.pay}</div>`;
+  html += `<div class="line"><b>Booking Date:</b> ${fmtDate(new Date(order.fulfillment_date+"T00:00:00"))}</div>`;
+  if(order.note) html += `<div class="line"><b>Note:</b> ${order.note}</div>`;
+  summary.innerHTML = html;
+
+  const fulfillmentNote = document.getElementById('confFulfillmentNote');
+  if(order.fulfillment_method === 'Delivery'){
+    fulfillmentNote.innerHTML = `🚚 <b>Delivery</b> to: ${order.address}<br>Please keep your phone reachable on the booking date. Your order is saved online, but we won't get an automatic alert — please also message us on WhatsApp (9999999999) to confirm.`;
+  } else {
+    fulfillmentNote.innerHTML = `📍 <b>Pickup:</b> Please collect from the shop and mention <b>${order.name}</b>'s order.<br>Your order is saved online, but we won't get an automatic alert — please also message us on WhatsApp (9999999999) to confirm.`;
+  }
+
+  drawOrderCode(order.id);
+  showScreen('confirm');
+}
+
+function showSubscriptionConfirmation(sub){
+  document.getElementById('confHeading').textContent = "Subscription Booked!";
+  document.getElementById('confOneTimeBlock').style.display = 'none';
+  document.getElementById('confSubscriptionBlock').style.display = 'block';
+
+  document.getElementById('confSubId').textContent = "Subscription ID: " + sub.id;
+  const summary = document.getElementById('confSubSummary');
+  let html = "";
+  sub.items.forEach(c=>{
+    html += `<div class="line"><b>${c.name}</b> × ${c.qty} (${c.unit}) — ₹${(c.price*c.qty).toFixed(2)} / day</div>`;
+  });
+  html += `<div class="line"><b>Daily Total:</b> ₹${sub.daily_total.toFixed(2)}</div>`;
+  html += `<div class="line"><b>Starts:</b> ${fmtDate(new Date(sub.start_date+"T00:00:00"))}</div>`;
+  html += `<div class="line"><b>Duration:</b> ${sub.duration_days ? sub.duration_days + ' days' : 'Until cancelled'}</div>`;
+  html += `<div class="line"><b>${sub.fulfillment_method}:</b> ${sub.fulfillment_method === 'Delivery' ? sub.address : 'Collect from shop'}</div>`;
+  summary.innerHTML = html;
+
+  showScreen('confirm');
+}
+
+/* Simple deterministic visual "pickup code" grid based on the Order ID.
+   This is a scannable-looking pattern for quick counter reference, not a
+   third-party barcode standard (no external libraries used). */
+function drawOrderCode(text){
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 160, cells = 16, cell = size/cells;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,size,size);
+  let seed = 0;
+  for(let i=0;i<text.length;i++) seed = (seed*31 + text.charCodeAt(i)) >>> 0;
+  function rand(){
+    seed = (seed*1103515245 + 12345) >>> 0;
+    return (seed >>> 8) % 1000 / 1000;
+  }
+  ctx.fillStyle = "#3E2712";
+  for(let y=0;y<cells;y++){
+    for(let x=0;x<cells;x++){
+      if(rand() > 0.55){
+        ctx.fillRect(x*cell, y*cell, cell, cell);
+      }
+    }
+  }
+  // corner anchors like a QR code, for a familiar look
+  [[0,0],[cells-4,0],[0,cells-4]].forEach(([cx,cy])=>{
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(cx*cell, cy*cell, cell*4, cell*4);
+    ctx.fillStyle = "#3E2712";
+    ctx.fillRect(cx*cell, cy*cell, cell*4, cell*4);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect((cx+0.7)*cell, (cy+0.7)*cell, cell*2.6, cell*2.6);
+    ctx.fillStyle = "#3E2712";
+    ctx.fillRect((cx+1.3)*cell, (cy+1.3)*cell, cell*1.4, cell*1.4);
+  });
+}
+
+/* ================= TRACK ORDER (customer, live) ================= */
+let trackPollTimer = null;
+
+function goToTrackFromConfirm(){
+  showScreen('track');
+}
+
+function stopTrackPolling(){
+  if(trackPollTimer){ clearInterval(trackPollTimer); trackPollTimer = null; }
+}
+
+function startTrackPolling(){
+  stopTrackPolling();
+  checkOrderStatusOnce();
+  trackPollTimer = setInterval(checkOrderStatusOnce, 8000);
+}
+
+const STATUS_DESC = {
+  "New": "We've received your booking and will start preparing it soon.",
+  "Preparing": "Your order is being prepared right now!",
+  "Ready": "Your order is ready — for pickup or out for delivery!",
+  "Completed": "This order is complete. Thanks for ordering!"
+};
+const STATUS_ICON = {"New":"🆕","Preparing":"🥛","Ready":"✅","Completed":"📦"};
+
+async function checkOrderStatusOnce(){
+  const box = document.getElementById('trackResult');
+  const idInput = document.getElementById('trackOrderId').value.trim().toUpperCase();
+  if(!idInput){
+    box.innerHTML = `<div class="empty-msg">Enter your Order ID above.</div>`;
+    stopTrackPolling();
+    return;
+  }
+  const { data, error } = await sb.rpc('get_order_status', { p_order_id: idInput });
+  if(error){
+    box.innerHTML = `<div class="empty-msg">Couldn't check status right now. Check your internet connection.</div>`;
+    return;
+  }
+  if(!data || data.length === 0){
+    box.innerHTML = `<div class="empty-msg">No order found with that ID. Please check and try again.</div>`;
+    stopTrackPolling();
+    return;
+  }
+  const o = data[0];
+  let itemsHtml = (o.items||[]).map(c=>`<li>${c.name} × ${c.qty}</li>`).join("");
+  const fulfillLine = o.fulfillment_method === 'Delivery'
+    ? `<div class="line"><b>Delivery to:</b> ${o.address || ''}</div>`
+    : `<div class="line"><b>Pickup</b></div>`;
+  box.innerHTML = `
+    <div class="conf-box" style="text-align:left;">
+      <div style="text-align:center;font-size:2rem;">${STATUS_ICON[o.status]||"📦"}</div>
+      <div style="text-align:center;font-weight:800;font-size:1.2rem;color:var(--brown);margin:6px 0;">${o.status}</div>
+      <div style="text-align:center;" class="note-line">${STATUS_DESC[o.status]||""}</div>
+      <div class="summary-list">
+        <div class="line"><b>Order ID:</b> ${o.id}</div>
+        <ul class="items">${itemsHtml}</ul>
+        ${o.fulfillment_date ? `<div class="line"><b>Booking Date:</b> ${o.fulfillment_date}</div>` : ''}
+        ${fulfillLine}
+        <div class="line"><b>Total:</b> ₹${o.total}</div>
+      </div>
+      <div class="note-line" style="text-align:center;margin-top:8px;">Auto-refreshing every few seconds…</div>
+    </div>
+  `;
+}
+
+/* ================= ORDERS (Supabase-backed, customer side) ================= */
+async function loadOrders(){
+  const { data, error } = await sb.from('orders').select('*').order('placed_at', {ascending:false});
+  if(error){ console.error(error); return null; }
+  return data;
+}
+async function saveOrder(order){
+  const { error } = await sb.from('orders').insert([order]);
+  if(error){ console.error(error); return {success:false, errorMsg: error.message}; }
+  return {success:true};
+}
+async function saveSubscription(sub){
+  const { error } = await sb.from('subscriptions').insert([sub]);
+  if(error){ console.error(error); return {success:false, errorMsg: error.message}; }
+  return {success:true};
+}
+
+/* ================= NAVIGATION ================= */
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('tabOrderBtn').classList.toggle('active', name==='order');
+  document.getElementById('tabTrackBtn').classList.toggle('active', name==='track');
+  const bar = document.getElementById('cartBar');
+  if(name==='order'){ renderCartBar(); }
+  else { bar.classList.add('hidden'); }
+  if(name==='cart') renderCart();
+  if(name==='checkout') populateCheckoutDates();
+
+  if(name==='track'){
+    const lastId = localStorage.getItem('avisekh_last_order_id');
+    if(lastId && !document.getElementById('trackOrderId').value){
+      document.getElementById('trackOrderId').value = lastId;
+    }
+    startTrackPolling();
+  } else {
+    stopTrackPolling();
+  }
+  window.scrollTo(0,0);
+}
+
+/* ================= INIT ================= */
+fetchMenuItems();
+renderCartBar();
+fetchShopStatus();
+</script>
+</body>
+</html>
